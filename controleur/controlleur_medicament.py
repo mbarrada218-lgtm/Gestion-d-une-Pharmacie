@@ -28,6 +28,6 @@ def medicament_controlleur(tableau_general):
     for row in ws.iter_rows(min_row=2, values_only=True):
         tableau_general.insert("", "end", values=row)
 
-    return wb, ws
-
+    return wb, ws 
     
+
