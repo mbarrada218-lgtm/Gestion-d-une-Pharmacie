@@ -1,6 +1,17 @@
+import sys
+import os
+
+# Ajoute le dossier racine du projet (parent de "view") au sys.path,
+# pour que "controleur" soit trouvable meme quand ce fichier est lance directement.
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from tkinter import *
 from tkinter import ttk
-from controleur.controlleur_medicament import (medicament_controlleur)
+from tkinter import messagebox
+from controleur.controlleur_medicament import (medicament_controlleur,
+                                                enregistrer_medicament,
+                                                charger_medicaments_expires,
+                                                charger_stock_faible)
 
 Font_texte = ("Bookman Old Style", 9, "bold")
 
@@ -109,7 +120,7 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
         combo_categorie = ttk.Combobox(F3, values=categories_medicaments,
                                     font=("Bookman old style", 11), state="readonly", width=38)
         combo_categorie.grid(row=1, column=1, ipady=7, padx=100)
-        combo_categorie.option_add("*TCombobox*Listbox.font",            ("Bookman old style", 11))
+        combo_categorie.option_add("*TCombobox*Listbox.font",("Bookman old style", 11))
         combo_categorie.option_add("*TCombobox*Listbox.background",      COLOR_ENTRY)
         combo_categorie.option_add("*TCombobox*Listbox.foreground",      ECRITURE)
         combo_categorie.option_add("*TCombobox*Listbox.selectBackground", ECRITURE)
@@ -144,10 +155,8 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
         ent_fourni.grid(row=7, column=1, ipady=7, padx=100)
 
         # ============================ LES BUTTONS ======================
-
-        # ================== ENREGISTRER LE MEDICAMENT =====================
-        def enregistrer_medicament():
-
+        def enregistrer_medicament_ui():
+            # Récupérer les valeurs
             nom       = ent_midecament.get()
             dosage    = ent_dosage.get()
             quantite  = ent_quantite.get()
@@ -157,23 +166,15 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
             p_vente   = ent_prix_vente.get()
             fourni    = ent_fourni.get()
 
-            # verification sahla : nom khass ykon mawjoud
-            if nom == "":
+            # La validation + l'enregistrement (Excel + tableau) se font dans le controlleur
+            ok, message = enregistrer_medicament(wb, ws, tableau_general, nom, dosage,
+                                                  quantite, date_ex, categorie,
+                                                  p_achat, p_vente, fourni)
+            if not ok:
+                messagebox.showinfo("Attention", message)
                 return
 
-            numero = len(tableau_general.get_children()) + 1
-
-            valeurs = (numero, nom, dosage, categorie, quantite,
-                       date_ex, p_achat, p_vente, fourni)
-
-            # 1) zidha f le tableau li bayn f l'ecran
-            tableau_general.insert("", "end", values=valeurs)
-
-            # 2) zidha f Excel w save
-            ws.append(valeurs)
-            wb.save("MEDICAMENTS.xlsx")
-
-            # 3) khawi les champs bach tzid wahda okhra
+            # Vider les champs
             ent_midecament.delete(0, END)
             ent_dosage.delete(0, END)
             ent_quantite.delete(0, END)
@@ -182,10 +183,13 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
             ent_prix_vente.delete(0, END)
             ent_fourni.delete(0, END)
 
+            # Réinitialiser la catégorie
+            combo_categorie.set("")
+
         save = Button(F3, text="╰┈➤ Enregistre",
                     font=("Bookman Old Style", 10, "bold"),
                     fg=BG_MAIN, bg=COLOR_BTN, width=15, relief="raised", height=2,
-                    command=enregistrer_medicament)
+                    command=enregistrer_medicament_ui)
         save.place(x=680, y=380)
         save.bind("<Enter>", on_enter)
         save.bind("<Leave>", on_leave)
@@ -270,6 +274,9 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                 
                 tableau_medicament.place(x=10, y=40)
 
+                # Remplir le tableau avec les medicaments dont la date est depassee
+                charger_medicaments_expires(ws, tableau_medicament)
+
             medicament_expiré ()
                 #===================================================
                 #                     STOCK DES MEDICAMENT 
@@ -321,6 +328,10 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                 tableau_stock.column(9, width=110)
                 
                 tableau_stock.place(x=10, y=40)
+
+                # Remplir le tableau avec les medicaments dont la quantite est <= 10
+                charger_stock_faible(ws, tableau_stock)
+
             stock_medicament()
 
             retour = Button(F1, text="⬅️ RETOUR",
@@ -351,9 +362,7 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
     #================= TABLEAU DES MEDICAMENT ======================
     F2 = Frame(F1, bd=3, relief="flat" , bg=BG_MAIN)
     F2.place(x=1, y=150, width=950, height=390)
-    # ملاحظة: F2 ما-كيتزادش f sub_widgets، حيت هو الجدول العام
-    # اللي خاصو يبقى ظاهر ديما، ماشي بلاصة كتبدل بين "ajouter" و "alertes"
-
+ 
         #=============== CREATION DE TABLEAU =====================
     style = ttk.Style()
     style.theme_use("clam")
@@ -399,33 +408,3 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
     wb, ws = medicament_controlleur(tableau_general)
 
 
-
-if __name__ == "__main__":
-    root = Tk()
-    root.title("Test - Gestion des Médicaments")
-    root.geometry("1000x600+100+20")
-    
-
-    BG_MAIN = "#F1F9F3"
-    COLOR_ENTRY = "#E8EDEC"
-    COLOR_TEXT = "#3B7E76"
-    COLOR_BTN = "#5B9E96"
-    ECRITURE = "#1B1E1D"
-
-    content_frame = Frame(root, bg=BG_MAIN)
-    content_frame.pack(fill=BOTH, expand=True)
-   
-    def clear_content():
-        for widget in content_frame.winfo_children():
-            widget.destroy()
-
-    def on_enter(event):
-        event.widget.config(bg="#5a5a80")
-
-    def on_leave(event):
-        event.widget.config(bg=COLOR_BTN)
-
-    medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,
-               ECRITURE, COLOR_BTN, clear_content, on_enter, on_leave)
-
-    root.mainloop()
