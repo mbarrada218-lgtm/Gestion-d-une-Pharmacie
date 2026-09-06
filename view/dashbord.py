@@ -1,6 +1,7 @@
 from tkinter import *
 from PIL import Image, ImageTk
-from view import medicaments
+from view import (medicaments , vents )
+
 
 
 # =================== VARIABLES GLOBALES ===================
@@ -72,7 +73,9 @@ def open_dashboard(root, role, username, BG_MAIN,
     B2.bind("<Leave>", on_leave)
 
     B3 = Button(F1, text="VENTE", font=("Bookman Old Style", 10, "bold"),
-                bg=COLOR_BTN, width=20, fg=BG_MAIN, relief="raised", height=2)
+                bg=COLOR_BTN, width=20, fg=BG_MAIN, relief="raised", height=2 , 
+                command=lambda:vents.vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
+                     ,clear_content ,on_enter,on_leave))
     B3.pack(pady=10)
     B3.bind("<Enter>", on_enter)
     B3.bind("<Leave>", on_leave)

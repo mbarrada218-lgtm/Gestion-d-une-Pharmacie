@@ -1,8 +1,6 @@
 import sys
 import os
 
-# Ajoute le dossier racine du projet (parent de "view") au sys.path,
-# pour que "controleur" soit trouvable meme quand ce fichier est lance directement.
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from tkinter import *
