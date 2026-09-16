@@ -3,8 +3,9 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from tkinter import *
 from tkinter import ttk
-from controleur.controlleur_vents import (validation_donnees , vents_controlleur)
-
+from tkinter import messagebox
+from controleur.controlleur_vents import (creation_fiche_excel, rechercher_medicament,ajouter_au_panier ,
+                                           sur_ordonanace , validation_de_historique)
 
 Font_texte = ("Bookman Old Style", 9, "bold")
 
@@ -12,7 +13,7 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
                      ,clear_content ,on_enter,on_leave):
     clear_content()
 
-    
+
     F1 = Frame(content_frame, bd=3, relief="groove" , bg=BG_MAIN)
     F1.place(y=10 , width=970, height=630)
 
@@ -26,51 +27,48 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
     # ================================================================
     def basculer_mode():
         if type_vente.get() == "simple":
-            # Afficher Vente Simple
-            F2.place(x=10,y=130,width=300,height=200)
-            # Cacher Vente sur ordonnance
             F3.place_forget()
-
+            F2.place(x=10,y=130,width=300,height=240)
         elif type_vente.get() == "ordonnance":
-            # Cacher Vente Simple
-            F2.place_forget()
-            # Afficher Vente sur ordonnance
-            F3.place(x=10,y=130,width=300,height=200)
+            F3.place(x=10,y=130,width=300,height=130)
+            F2.place(x=10,y=260,width=300,height=240)
 
 
     Label(F1 , text="CHOISISSEZ LE TYPE DE VENTE :" , font=("Bookman old style" , 10 , "bold ")).place(x=5 , y=100)
-    
- 
+
+
     #====================================================================
     #                           VENTE SIMPLE
     #=====================================================================
 
-    
     F2 = Frame(F1 , bd=3, relief="groove" )
     F2.place(x= 10, y=130 , width=300, height=240)
+
 
     Label(F2 , text="RECHERCHER :" , font= Font_texte).place(x = 5 , y=10)
     RECH = Entry(F2 , font=("Bookman old style" , 9 , "bold " ), highlightbackground="#5B9E96" , highlightthickness=2)
     RECH.place(x= 120 , y=10)
+    RECH.bind("<Return>",lambda event: rechercher_medicament(RECH, NOM, DOSAGE, STOCK, PR_VENT ))
+
 
     Label(F2 , text="NOM MED       :" , font= Font_texte).place(x = 5 , y=40)
-    NOM = Entry(F2 , font=("Bookman old style" , 9 , "bold " ), highlightbackground="#5B9E96" , highlightthickness=2)
+    NOM = Entry(F2 , font=("Bookman old style" , 9 , "bold " ), state="readonly" , highlightbackground="#5B9E96" , highlightthickness=2)
     NOM.place(x= 120 , y=40)
 
     Label(F2 , text="DOSAGE         :" , font= Font_texte).place(x = 5 , y=70)
-    DOSAGE = Entry(F2 , font=("Bookman old style" , 9 , "bold " ), highlightbackground="#5B9E96" , highlightthickness=2)
+    DOSAGE = Entry(F2 , font=("Bookman old style" , 9 , "bold " ), state="readonly" , highlightbackground="#5B9E96" , highlightthickness=2)
     DOSAGE.place(x= 120 , y=70)
 
     Label(F2 , text="STOCK            :" , font= Font_texte).place(x = 5 , y=100)
-    STOCK = Entry(F2 , font=("Bookman old style" , 9 , "bold " ), highlightbackground="#5B9E96" , highlightthickness=2)
+    STOCK = Entry(F2 , font=("Bookman old style" , 9 , "bold " ), state="readonly" , highlightbackground="#5B9E96" , highlightthickness=2)
     STOCK.place(x= 120 , y=100)
 
     Label(F2 , text="PRIX DE VENTE :" , font= ("Bookman old style" , 8 , "bold ")).place(x = 5 , y=130)
-    PR_VENT = Entry(F2 , font=("Bookman old style" , 9 , "bold " ), highlightbackground="#5B9E96" , highlightthickness=2)
+    PR_VENT = Entry(F2 , font=("Bookman old style" , 9 , "bold " ), state="readonly" , highlightbackground="#5B9E96" , highlightthickness=2)
     PR_VENT.place(x= 120 , y=130)
 
     Label(F2 , text="QUANTITE :" , font= ("Bookman old style" , 8 , "bold ")).place(x = 5 , y=160)
-    QUAN = Spinbox(F2, from_=1, to=100, width=5, bg=COLOR_ENTRY, 
+    QUAN = Spinbox(F2, from_=1, to=1000 , width=5, bg=COLOR_ENTRY, 
                       font=("Bookman old style", 11))
     QUAN.place(x= 120 , y=160)
 
@@ -95,19 +93,6 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
     N_ORD = Entry(F3 , font=("Bookman old style" , 9 , "bold " ), highlightbackground="#5B9E96" , highlightthickness=2)
     N_ORD.place(x= 120 , y=90)
 
-
-    def basculer_mode():
-        if type_vente.get() == "simple":
-            # Cacher Vente sur ordonnance
-            F3.place_forget()
-            # Afficher Vente Simple
-            F2.place(x=10,y=130,width=300,height=240)
-
-        elif type_vente.get() == "ordonnance":
-            # Afficher Vente sur ordonnance
-            F3.place(x=10,y=130,width=300,height=130)
-            # Cacher Vente Simple
-            F2.place(x=10,y=260,width=300,height=240)
     type_vente = StringVar(value="simple")
 
     Radiobutton(F1, text=" ➜ Vente Simple",
@@ -120,7 +105,7 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
                 font=("Bookman old style" , 10 , "bold "), bg="whitesmoke", fg="darkblue",
                 command=basculer_mode).place(x=400 , y=100)
     basculer_mode()
-
+    
     #====================================================================
     #                           TABLEAU DE PANIER
     #=====================================================================
@@ -132,23 +117,20 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
     style = ttk.Style()
     style.theme_use("clam")
     style.configure("Treeview.Heading",font=("Bookman Old Style", 8, "bold"), background=BG_MAIN)
-
     style.configure("Treeview",font=("Bookman old style", 8),background=BG_MAIN )
 
     tableau_panier = ttk.Treeview(F4 , columns=(1,2,3,4,5) , height=5, 
         show="headings", style="Treeview")
 
-
     sc = ttk.Scrollbar(F4, orient="vertical" , command=tableau_panier.yview)
     sc.place( x= 595 , y= 30 , height=127)
     tableau_panier.config(yscrollcommand=sc.set)
 
-    tableau_panier.heading(1, text="N° SERIE")
+    tableau_panier.heading(1, text="N°_SERIE")
     tableau_panier.heading(2, text="Nom du Médicament")
     tableau_panier.heading(3, text=" Dosage (mg/ml)")
     tableau_panier.heading(4, text="Quantité")
     tableau_panier.heading(5, text="Prix de Vente")
-
 
     tableau_panier.column(1, width=100)
     tableau_panier.column(2, width=120)
@@ -158,16 +140,18 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
 
     tableau_panier.place(x=10, y=30)
 
-    Label(F4, text=" ➜ TOTALE : " , font=Font_texte , bg="#86B7B1" , width=67).place(x=41 , y=159)
+    # ---- Total ----
+    total_var = StringVar(value="0.00")
+
+    Label(F4, text=" ➜ TOTALE : " , font=Font_texte , bg="#86B7B1" , width=50, anchor="w").place(x=41 , y=159)
+    Label(F4, textvariable=total_var, font=Font_texte, bg="#86B7B1", width=15, anchor="e").place(x=440, y=159)
 
     VALIDE = Button(F4, text="VALIDE ➜]", font=("Bookman Old Style", 10, "bold"),
-                bg=COLOR_TEXT, fg=BG_MAIN, relief="raised", height=2 , width=15, 
-                command=lambda:validation_donnees(RECH,NOM,DOSAGE,STOCK,PR_VENT,QUAN,NOM_CLIENT,MEDECIN,
-                       N_ORD,wb,ws,tableau_historique))
+                bg=COLOR_TEXT, fg=BG_MAIN, relief="raised", height=2 , width=15,
+                command=lambda:validation_de_historique (tableau_panier , type_vente , tableau_historique , NOM_CLIENT , MEDECIN , N_ORD ))
     VALIDE.place(x= 40 , y=180)
     VALIDE.bind("<Enter>", on_enter)
     VALIDE.bind("<Leave>", on_leave)
-
 
     ANNULEE = Button(F4, text="ANNULEE", font=("Bookman Old Style", 10, "bold"),
                 bg=COLOR_TEXT, fg=BG_MAIN, relief="raised", height=2 , width=15)
@@ -175,13 +159,12 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
     ANNULEE.bind("<Enter>", on_enter)
     ANNULEE.bind("<Leave>", on_leave)
 
-    
-    Label(F4, text=" ➜ HISTORIQUE DES VENTES " , font=Font_texte).place( y=250)
-    style = ttk.Style()
-    style.theme_use("clam")
-    style.configure("Treeview.Heading",font=("Bookman Old Style", 8, "bold"), background=BG_MAIN)
 
-    style.configure("Treeview",font=("Bookman old style", 8),background=BG_MAIN )
+    Label(F4, text=" ➜ HISTORIQUE DES VENTES " , font=Font_texte).place( y=250)
+    style2 = ttk.Style()
+    style2.theme_use("clam")
+    style2.configure("Treeview.Heading",font=("Bookman Old Style", 8, "bold"), background=BG_MAIN)
+    style2.configure("Treeview",font=("Bookman old style", 8),background=BG_MAIN )
 
     tableau_historique = ttk.Treeview(F4 , columns=(1,2,3,4,5,6,7,8,9,10) , height=7, 
         show="headings", style="Treeview")
@@ -191,7 +174,6 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
 
     scH = ttk.Scrollbar(F4, orient="horizontal" , command=tableau_historique.xview)
     scH.place(y= 448 , width=643)
-
 
     tableau_historique.config(yscrollcommand=scV.set , xscrollcommand=scH.set)
 
@@ -206,7 +188,6 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
     tableau_historique.heading(9, text="N°Ordonnance")
     tableau_historique.heading(10, text="Nom du Client")
 
-
     tableau_historique.column(1, width=25)
     tableau_historique.column(2, width=90)
     tableau_historique.column(3, width=100)
@@ -219,88 +200,22 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
     tableau_historique.column(10, width=100)
 
     tableau_historique.place(x=0,y=280,width=630,height=165)
-    wb, ws = vents_controlleur(tableau_historique)
+
+    wb, ws = creation_fiche_excel(tableau_historique)
 
     AJOUTER = Button(F2, text="➜ AJOUTER AU PANIER", font=("Bookman Old Style", 8, "bold"),
-                      bg=COLOR_TEXT, fg=BG_MAIN, relief="raised" )
+                      bg=COLOR_TEXT, fg=BG_MAIN, relief="raised" , command=lambda:ajouter_au_panier (RECH ,NOM , DOSAGE , STOCK
+                                                                                                      ,PR_VENT, QUAN , ws,  tableau_panier) )
     AJOUTER.place(x=70, y=200)
     AJOUTER.bind("<Enter>", on_enter)
     AJOUTER.bind("<Leave>", on_leave)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
     root = Tk()
     root.title("Test - Gestion des Médicaments")
     root.geometry("1000x600+100+20")
-    
+
 
     BG_MAIN = "#F1F9F3"
     COLOR_ENTRY = "#E8EDEC"
@@ -310,7 +225,7 @@ if __name__ == "__main__":
 
     content_frame = Frame(root, bg=BG_MAIN)
     content_frame.pack(fill=BOTH, expand=True)
-   
+
     def clear_content():
         for widget in content_frame.winfo_children():
             widget.destroy()

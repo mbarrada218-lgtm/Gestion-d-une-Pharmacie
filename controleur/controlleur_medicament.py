@@ -2,17 +2,32 @@ from openpyxl import load_workbook, Workbook
 from datetime import datetime
 import os
 
-FICHIER_EXCEL = "MEDICAMENTS.xlsx"
+FICHIER_MEDICAMENTS = "MEDICAMENTS.xlsx"
+NOM_FEUILLE_MEDICAMENTS = "Medicaments"
 SEUIL_STOCK_FAIBLE = 10
 
-def medicament_controlleur(tableau_general):
-    if os.path.exists(FICHIER_EXCEL):
-        wb = load_workbook(FICHIER_EXCEL)
-        ws = wb["Medicaments"]
+
+def _ouvrir_fichier_medicaments():
+    """
+    Ouvre (ou crée) MEDICAMENTS.xlsx et retourne (wb, ws) sur la feuille
+    "Medicaments". Cette fonction est LA source unique de vérité pour
+    savoir comment accéder au fichier/feuille : d'autres contrôleurs
+    (ex: controlleur_vents.py pour la recherche) doivent l'importer et
+    l'utiliser plutôt que de ré-ouvrir le fichier eux-mêmes, pour éviter
+    tout risque de mismatch (ex: mauvais nom de feuille).
+    """
+    if os.path.exists(FICHIER_MEDICAMENTS):
+        wb = load_workbook(FICHIER_MEDICAMENTS)
+        if NOM_FEUILLE_MEDICAMENTS in wb.sheetnames:
+            ws = wb[NOM_FEUILLE_MEDICAMENTS]
+        else:
+            # Compatibilité : si la feuille n'a pas exactement ce nom
+            # (fichier créé/modifié manuellement), on prend la feuille active.
+            ws = wb.active
     else:
         wb = Workbook()
         ws = wb.active
-        ws.title = "Medicaments"
+        ws.title = NOM_FEUILLE_MEDICAMENTS
 
         ws["A1"] = "N°"
         ws["B1"] = "Nom du medicament"
@@ -24,7 +39,13 @@ def medicament_controlleur(tableau_general):
         ws["H1"] = "Prix de vente"
         ws["I1"] = "Fournisseur"
 
-        wb.save(FICHIER_EXCEL)
+        wb.save(FICHIER_MEDICAMENTS)
+
+    return wb, ws
+
+
+def medicament_controlleur(tableau_general):
+    wb, ws = _ouvrir_fichier_medicaments()
 
     for row in ws.iter_rows(min_row=2, values_only=True):
         tableau_general.insert("", "end", values=row)
@@ -83,7 +104,7 @@ def enregistrer_medicament(wb, ws, tableau_general, nom, dosage, quantite,
 
     # 1) Ajouter dans Excel
     ws.append(valeurs)
-    wb.save(FICHIER_EXCEL)
+    wb.save("MEDICAMENTS.xlsx")
 
     # 2) Ajouter dans le tableau
     tableau_general.insert("", "end", values=valeurs)
