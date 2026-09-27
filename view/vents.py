@@ -5,7 +5,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from controleur.controlleur_vents import (creation_fiche_excel, rechercher_medicament,ajouter_au_panier ,
-                                           sur_ordonanace , validation_de_historique)
+                                           sur_ordonanace , validation_de_historique , annuler , )
 
 Font_texte = ("Bookman Old Style", 9, "bold")
 
@@ -148,13 +148,15 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
 
     VALIDE = Button(F4, text="VALIDE ➜]", font=("Bookman Old Style", 10, "bold"),
                 bg=COLOR_TEXT, fg=BG_MAIN, relief="raised", height=2 , width=15,
-                command=lambda:validation_de_historique (tableau_panier , type_vente , tableau_historique , NOM_CLIENT , MEDECIN , N_ORD ))
+                command=lambda:validation_de_historique (tableau_panier , 
+                                type_vente , tableau_historique , NOM_CLIENT , MEDECIN , N_ORD , ws,wb))
     VALIDE.place(x= 40 , y=180)
     VALIDE.bind("<Enter>", on_enter)
     VALIDE.bind("<Leave>", on_leave)
 
     ANNULEE = Button(F4, text="ANNULEE", font=("Bookman Old Style", 10, "bold"),
-                bg=COLOR_TEXT, fg=BG_MAIN, relief="raised", height=2 , width=15)
+                bg=COLOR_TEXT, fg=BG_MAIN, relief="raised", height=2 , width=15 ,
+                  command=lambda:annuler(tableau_panier , RECH,NOM,DOSAGE,STOCK,PR_VENT,QUAN , NOM_CLIENT , MEDECIN , N_ORD))
     ANNULEE.place(x= 438 , y=180)
     ANNULEE.bind("<Enter>", on_enter)
     ANNULEE.bind("<Leave>", on_leave)
@@ -200,6 +202,7 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
     tableau_historique.column(10, width=100)
 
     tableau_historique.place(x=0,y=280,width=630,height=165)
+    
 
     wb, ws = creation_fiche_excel(tableau_historique)
 

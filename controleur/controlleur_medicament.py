@@ -8,21 +8,13 @@ SEUIL_STOCK_FAIBLE = 10
 
 
 def _ouvrir_fichier_medicaments():
-    """
-    Ouvre (ou crée) MEDICAMENTS.xlsx et retourne (wb, ws) sur la feuille
-    "Medicaments". Cette fonction est LA source unique de vérité pour
-    savoir comment accéder au fichier/feuille : d'autres contrôleurs
-    (ex: controlleur_vents.py pour la recherche) doivent l'importer et
-    l'utiliser plutôt que de ré-ouvrir le fichier eux-mêmes, pour éviter
-    tout risque de mismatch (ex: mauvais nom de feuille).
-    """
+
     if os.path.exists(FICHIER_MEDICAMENTS):
         wb = load_workbook(FICHIER_MEDICAMENTS)
         if NOM_FEUILLE_MEDICAMENTS in wb.sheetnames:
             ws = wb[NOM_FEUILLE_MEDICAMENTS]
         else:
-            # Compatibilité : si la feuille n'a pas exactement ce nom
-            # (fichier créé/modifié manuellement), on prend la feuille active.
+
             ws = wb.active
     else:
         wb = Workbook()
