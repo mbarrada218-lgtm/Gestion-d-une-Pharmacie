@@ -5,7 +5,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from controleur.controlleur_vents import (creation_fiche_excel, rechercher_medicament,ajouter_au_panier ,
-                                           sur_ordonanace , validation_de_historique , annuler , )
+                                           sur_ordonanace , validation_de_historique , annuler ,change_totale )
 
 Font_texte = ("Bookman Old Style", 9, "bold")
 
@@ -140,8 +140,10 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
 
     tableau_panier.place(x=10, y=30)
 
-    # ---- Total ----
     total_var = StringVar(value="0.00")
+    change_totale (tableau_panier , total_var)
+    
+
 
     Label(F4, text=" ➜ TOTALE : " , font=Font_texte , bg="#86B7B1" , width=50, anchor="w").place(x=41 , y=159)
     Label(F4, textvariable=total_var, font=Font_texte, bg="#86B7B1", width=15, anchor="e").place(x=440, y=159)
@@ -207,8 +209,9 @@ def vents(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
     wb, ws = creation_fiche_excel(tableau_historique)
 
     AJOUTER = Button(F2, text="➜ AJOUTER AU PANIER", font=("Bookman Old Style", 8, "bold"),
-                      bg=COLOR_TEXT, fg=BG_MAIN, relief="raised" , command=lambda:ajouter_au_panier (RECH ,NOM , DOSAGE , STOCK
-                                                                                                      ,PR_VENT, QUAN , ws,  tableau_panier) )
+                      bg=COLOR_TEXT, fg=BG_MAIN, relief="raised" , 
+                      command=lambda:ajouter_au_panier (RECH ,NOM , DOSAGE , STOCK
+                                                        ,PR_VENT, QUAN , ws,  tableau_panier , total_var) )
     AJOUTER.place(x=70, y=200)
     AJOUTER.bind("<Enter>", on_enter)
     AJOUTER.bind("<Leave>", on_leave)
