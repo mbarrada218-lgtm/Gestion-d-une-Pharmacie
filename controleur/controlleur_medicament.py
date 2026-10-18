@@ -51,7 +51,7 @@ def validation_des_donnees(nom, dosage, quantite, date_ex, categorie, p_achat, p
         return False, "Remplis tous les champs !"
 
     try:
-        dosage = float(dosage)
+        dosage = str(dosage)
         quantite = int(quantite)
         p_achat = float(p_achat)
         p_vente = float(p_vente)

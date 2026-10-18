@@ -1,6 +1,6 @@
 from tkinter import *
 from PIL import Image, ImageTk
-from view import (medicaments , vents )
+from view import (medicaments , vents , statistique )
 
 
 
@@ -81,7 +81,9 @@ def open_dashboard(root, role, username, BG_MAIN,
     B3.bind("<Leave>", on_leave)
 
     B4 = Button(F1, text="STATISTIQUE", font=("Bookman Old Style", 10, "bold"),
-                bg=COLOR_BTN, width=20, fg=BG_MAIN, relief="raised", height=2)
+                bg=COLOR_BTN, width=20, fg=BG_MAIN, relief="raised", height=2 , 
+                command=lambda:statistique.statistique_view(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
+                     ,clear_content ,on_enter,on_leave))
     B4.pack(pady=10)
     B4.bind("<Enter>", on_enter)
     B4.bind("<Leave>", on_leave)
@@ -197,7 +199,7 @@ def fram_accueil():
         "💊 Vérifiez les dates d'expiration régulièrement",
         "📦 Mettez à jour le stock après chaque vente",
         "🔒 Déconnectez-vous après chaque utilisation",
-        "📊 Consultez les statistiques pour suivre les ventes",
+        "📊 Consultez les statistique pour suivre les ventes",
         "🔔 Signalez tout médicament en rupture de stock",
     ]
 
