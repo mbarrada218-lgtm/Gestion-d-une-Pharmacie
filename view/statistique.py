@@ -143,32 +143,3 @@ def statistique_view(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY, ECRITURE, 
     B_RESUME.bind("<Enter>", on_enter)
     B_RESUME.bind("<Leave>", on_leave)
 
-
-if __name__ == "__main__":
-    root = Tk()
-    root.title("Test - Gestion des Médicaments")
-    root.geometry("1000x600+100+20")
-
-    BG_MAIN = "#F1F9F3"
-    COLOR_ENTRY = "#E8EDEC"
-    COLOR_TEXT = "#3B7E76"
-    COLOR_BTN = "#5B9E96"
-    ECRITURE = "#1B1E1D"
-
-    content_frame = Frame(root, bg=BG_MAIN)
-    content_frame.pack(fill=BOTH, expand=True)
-
-    def clear_content():
-        for widget in content_frame.winfo_children():
-            widget.destroy()
-
-    def on_enter(event):
-        event.widget.config(bg="#5a5a80")
-
-    def on_leave(event):
-        event.widget.config(bg=COLOR_BTN)
-
-    statistique_view(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,
-                     ECRITURE, COLOR_BTN, clear_content, on_enter, on_leave)
-
-    root.mainloop()
