@@ -1,6 +1,6 @@
 from tkinter import *
 from PIL import Image, ImageTk
-from view import (medicaments , vents , statistique )
+from view import (medicaments , vents , statistique , utilisateur)
 
 
 
@@ -89,7 +89,9 @@ def open_dashboard(root, role, username, BG_MAIN,
     B4.bind("<Leave>", on_leave)
 
     B5 = Button(F1, text="CREER UN UTILISATEUR", font=("Bookman Old Style", 10, "bold"),
-                bg=COLOR_BTN, width=20, fg=BG_MAIN, relief="raised", height=2)
+                bg=COLOR_BTN, width=20, fg=BG_MAIN, relief="raised", height=2 ,
+                  command=lambda:utilisateur.utilisateur(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_BTN
+                  ,clear_content ,on_enter,on_leave))
     B5.pack(pady=10)
     B5.bind("<Enter>", on_enter)
     B5.bind("<Leave>", on_leave)
@@ -128,7 +130,7 @@ def fram_accueil():
     F2.place(x=580, y=50, width=390, height=485)
     F2.pack_propagate(False)
 
-    original_img = Image.open("img2.png")
+    original_img = Image.open("images/img2.png")
     resize_original = original_img.resize((400, 480))
     img_final = ImageTk.PhotoImage(resize_original)
     img_label = Label(F2, image=img_final)
