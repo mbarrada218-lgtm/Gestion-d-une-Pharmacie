@@ -1,7 +1,5 @@
 from tkinter import *
 
-
-#================= APPLICATION  =========
 def login(BG_MAIN, COLOR_ENTRY, COLOR_TEXT, COLOR_BTN, ECRITURE, FONT_TITLE, on_enter, on_leave):
     from controleur import controlleur_login
 
@@ -11,7 +9,6 @@ def login(BG_MAIN, COLOR_ENTRY, COLOR_TEXT, COLOR_BTN, ECRITURE, FONT_TITLE, on_
     root.resizable(FALSE, FALSE)
     root.config(bg=BG_MAIN)
 
-    # =================== TITRE ===================
     Label(root, text=" ✚ GESTION D'UNE PHARMACIE",
           font=("Bookman Old Style", 22, "bold"),
           height=4, fg=COLOR_TEXT, bg=BG_MAIN).pack()
@@ -23,7 +20,6 @@ def login(BG_MAIN, COLOR_ENTRY, COLOR_TEXT, COLOR_BTN, ECRITURE, FONT_TITLE, on_
           font=("Bookman Old Style", 9, "bold"),
           fg=COLOR_TEXT, bg=BG_MAIN).pack(pady=20)
 
-    # =================== LOGIN UI ===================
     fram = Frame(root, bg=BG_MAIN, width=400, height=390, relief="raised", bd=2)
     fram.pack()
     fram.pack_propagate(False)

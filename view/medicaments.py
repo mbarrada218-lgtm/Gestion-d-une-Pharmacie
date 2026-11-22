@@ -17,16 +17,6 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                      ,clear_content ,on_enter,on_leave):
     clear_content()
 
-    ent_midecament  = None
-    ent_dosage      = None
-    ent_date_ex     = None
-    ent_quantite    = None
-    combo_categorie = None
-    ent_fourni      = None
-    ent_prix_achat  = None
-    ent_prix_vente  = None
-    wb = None
-    ws = None
 
     sub_widgets = []
 
@@ -38,7 +28,6 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                 pass
         sub_widgets.clear()
 
-
     F1 = Frame(content_frame, bd=3, relief="groove" , bg=BG_MAIN)
     F1.place(y=10 , width=970, height=630)
 
@@ -46,26 +35,17 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                    , height=3,bg=COLOR_TEXT, fg=BG_MAIN)
     title.pack()
 
-    #=========================================================================================================
-    #                                       AJOUTER LES MEDICAMENTS
-    #=========================================================================================================
-    def ajouter_medicamant(values=None):
+    def ajouter_medicamant():
 
-        nonlocal ent_midecament, ent_dosage, ent_date_ex
-        nonlocal ent_quantite, combo_categorie, ent_fourni
-        nonlocal ent_prix_achat, ent_prix_vente, wb, ws
 
-        selected_row = [None]
 
         clear_sub_widgets()
-        F2.place_forget()   # <-- khabbi tableau_general mli kandkhlo l'formulaire
+        F2.place_forget()
 
-        # =============================== FICHE DES MEDICAMENT ====================
         F3 = Frame(F1, bd=1, relief="flat", bg=BG_MAIN)
         F3.place(x=20, y=150, width=890, height=450)
         sub_widgets.append(F3)
 
-        # ========================= NOM DU MEDICAMENT ============================
         nom_midecament = Label(F3, text=" Nom du Médicament : ", font=Font_texte, bg=BG_MAIN, fg=COLOR_TEXT)
         nom_midecament.grid(row=0, pady=10, sticky="w")
 
@@ -73,7 +53,6 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                             relief="groove", bd=2, bg=COLOR_ENTRY, fg=ECRITURE)
         ent_midecament.grid(row=1, ipady=7, padx=5)
 
-        # ========================= DOSAGE ============================
         dosage = Label(F3, text=" Dosage (mg/ml) : ", font=Font_texte, bg=BG_MAIN, fg=COLOR_TEXT)
         dosage.grid(row=2, pady=10, sticky="w")
 
@@ -81,7 +60,6 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                         relief="groove", bd=2, bg=COLOR_ENTRY, fg=ECRITURE)
         ent_dosage.grid(row=3, ipady=7, padx=5)
 
-        # ========================= QUANTITE EN STOCK ==========================
         quantite = Label(F3, text=" Quantité en stock :", font=Font_texte, bg=BG_MAIN, fg=COLOR_TEXT)
         quantite.grid(row=4, pady=10, sticky="w")
 
@@ -89,7 +67,6 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                             relief="groove", bd=2, bg=COLOR_ENTRY, fg=ECRITURE)
         ent_quantite.grid(row=5, ipady=7, padx=5)
 
-        # ========================= DATE EXPIRATION ==========================
         date_ex = Label(F3, text=" Date d'Expiration :  ", font=Font_texte, bg=BG_MAIN, fg=COLOR_TEXT)
         date_ex.grid(row=6, pady=10, sticky="w")
 
@@ -97,7 +74,6 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                             relief="groove", bd=2, bg=COLOR_ENTRY, fg=ECRITURE)
         ent_date_ex.grid(row=7, ipady=7, padx=5)
 
-        # ==================== CATEGORIE ============================
         categorie = Label(F3, text=" Catégorie : ", font=Font_texte, bg=BG_MAIN, fg=COLOR_TEXT)
         categorie.grid(row=0, column=1, padx=100, pady=10, sticky="w")
 
@@ -125,16 +101,12 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
         combo_categorie.option_add("*TCombobox*Listbox.selectForeground", COLOR_ENTRY)
         combo_categorie.current(0)
 
-        # ========================= PRIX D'ACHAT ===========================
-
         prix_achat = Label(F3, text=" Prix d'Achat : ", font=Font_texte, bg=BG_MAIN, fg=COLOR_TEXT)
         prix_achat.grid(row=2, column=1, padx=100, pady=10, sticky="w")
 
         ent_prix_achat = Entry(F3, font=("Bookman old style", 11), width=40,
                         relief="groove", bd=2, bg=COLOR_ENTRY, fg=ECRITURE)
         ent_prix_achat.grid(row=3, column=1, ipady=7, padx=100)
-
-        # ========================= PRIX DE VENTE ===========================
 
         prix_vente = Label(F3, text=" Prix de Vente : ", font=Font_texte, bg=BG_MAIN, fg=COLOR_TEXT)
         prix_vente.grid(row=4, column=1, padx=100, pady=10, sticky="w")
@@ -143,8 +115,6 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                         relief="groove", bd=2, bg=COLOR_ENTRY, fg=ECRITURE)
         ent_prix_vente.grid(row=5, column=1, ipady=7, padx=100)
 
-
-        # ========================= FOURNISSEUR ===========================
         fournisseur = Label(F3, text=" Fournisseur : ", font=Font_texte, bg=BG_MAIN, fg=COLOR_TEXT)
         fournisseur.grid(row=6, column=1, padx=100, pady=10, sticky="w")
 
@@ -152,9 +122,7 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                         relief="groove", bd=2, bg=COLOR_ENTRY, fg=ECRITURE)
         ent_fourni.grid(row=7, column=1, ipady=7, padx=100)
 
-        # ============================ LES BUTTONS ======================
         def enregistrer_medicament_ui():
-            # Récupérer les valeurs
             nom       = ent_midecament.get()
             dosage    = ent_dosage.get()
             quantite  = ent_quantite.get()
@@ -164,7 +132,6 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
             p_vente   = ent_prix_vente.get()
             fourni    = ent_fourni.get()
 
-            # La validation + l'enregistrement (Excel + tableau) se font dans le controlleur
             ok, message = enregistrer_medicament(wb, ws, tableau_general, nom, dosage,
                                                   quantite, date_ex, categorie,
                                                   p_achat, p_vente, fourni)
@@ -172,7 +139,6 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                 messagebox.showinfo("Attention", message)
                 return
 
-            # Vider les champs
             ent_midecament.delete(0, END)
             ent_dosage.delete(0, END)
             ent_quantite.delete(0, END)
@@ -181,7 +147,6 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
             ent_prix_vente.delete(0, END)
             ent_fourni.delete(0, END)
 
-            # Réinitialiser la catégorie
             combo_categorie.set("")
 
         save = Button(F3, text="╰┈➤ Enregistre",
@@ -205,25 +170,16 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
     btn_ajout = Button(F1, text="✚ AJOUTER LES MEDICAMENTS",
                     fg=BG_MAIN, bg=COLOR_BTN, font=Font_texte,
                     width=30, height=2, command=lambda: ajouter_medicamant())
-    
+
     btn_ajout.place(x=5, y=95)
     btn_ajout.bind("<Enter>", on_enter)
     btn_ajout.bind("<Leave>", on_leave)
 
-    
-    #=========================================================================================================
-    #=========================================================================================================
-    #                                            GESTION DES ALERTES
-    #=========================================================================================================
-    #=========================================================================================================
     def alertes_medicament ():
-            
-            clear_sub_widgets()
-            F2.place_forget()   # <-- khabbi tableau_general mli kandkhlo les alertes
 
-                #===================================================
-                #                     MEDICAMENT EXPIRE
-                #===================================================
+            clear_sub_widgets()
+            F2.place_forget()
+
             def medicament_expiré ():
                 F4 = Frame(F1, bd=3, relief="flat" , bg=BG_MAIN)
                 F4.place(x=1, y=150, width=950, height=200)
@@ -242,14 +198,13 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                                         font=("Bookman old style", 8),
                                         background=BG_MAIN )
 
-                tableau_medicament = ttk.Treeview(F4 , columns=(1,2,3,4,5,6,7,8,9) , height=6, 
+                tableau_medicament = ttk.Treeview(F4 , columns=(1,2,3,4,5,6,7,8,9) , height=6,
                                     show="headings", style="Treeview")
-
 
                 sc = ttk.Scrollbar(F4, orient="vertical" , command=tableau_medicament.yview)
                 sc.place( x= 930 , y= 40 , height=148)
                 tableau_medicament.config(yscrollcommand=sc.set)
-                
+
                 tableau_medicament.heading(1, text="N°")
                 tableau_medicament.heading(2, text="Nom du Médicament")
                 tableau_medicament.heading(3, text=" Dosage (mg/ml)")
@@ -269,21 +224,17 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                 tableau_medicament.column(7, width=110)
                 tableau_medicament.column(8, width=110)
                 tableau_medicament.column(9, width=110)
-                
+
                 tableau_medicament.place(x=10, y=40)
 
-                # Remplir le tableau avec les medicaments dont la date est depassee
                 charger_medicaments_expires(ws, tableau_medicament)
 
             medicament_expiré ()
-                #===================================================
-                #                     STOCK DES MEDICAMENT 
-                #===================================================
             def stock_medicament():
                 F5 = Frame(F1, bd=3, relief="flat" , bg=BG_MAIN)
                 F5.place(x=1, y=350, width=950, height=200)
                 sub_widgets.append(F5)
-                
+
                 titre_med_exp = Label(F5, text=" ▶ Stock Faible (<=10) : ", font=Font_texte,bg=BG_MAIN, fg=COLOR_TEXT)
                 titre_med_exp.place(x=5 , y=5)
 
@@ -292,19 +243,18 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                 style.configure("Treeview.Heading",
                                         font=("Bookman Old Style", 8, "bold"),
                                         background=BG_MAIN)
-                
+
                 style.configure("Treeview",
                                         font=("Bookman old style", 8),
                                         background=BG_MAIN )
-                
-                tableau_stock = ttk.Treeview(F5 , columns=(1,2,3,4,5,6,7,8,9) , height=6, 
+
+                tableau_stock = ttk.Treeview(F5 , columns=(1,2,3,4,5,6,7,8,9) , height=6,
                                     show="headings", style="Treeview")
-                
-                
+
                 sc = ttk.Scrollbar(F5, orient="vertical" , command=tableau_stock.yview)
                 sc.place( x= 930 , y= 40 , height=148)
                 tableau_stock.config(yscrollcommand=sc.set)
-                
+
                 tableau_stock.heading(1, text="N°")
                 tableau_stock.heading(2, text="Nom du Médicament")
                 tableau_stock.heading(3, text=" Dosage (mg/ml)")
@@ -314,7 +264,7 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                 tableau_stock.heading(7, text="Prix d'Achat")
                 tableau_stock.heading(8, text="Prix de Vente")
                 tableau_stock.heading(9, text="Fournisseur")
-                
+
                 tableau_stock.column(1, width=25)
                 tableau_stock.column(2, width=120)
                 tableau_stock.column(3, width=110)
@@ -324,10 +274,9 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
                 tableau_stock.column(7, width=110)
                 tableau_stock.column(8, width=110)
                 tableau_stock.column(9, width=110)
-                
+
                 tableau_stock.place(x=10, y=40)
 
-                # Remplir le tableau avec les medicaments dont la quantite est <= 10
                 charger_stock_faible(ws, tableau_stock)
 
             stock_medicament()
@@ -343,25 +292,15 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
             retour.bind("<Leave>", on_leave)
             sub_widgets.append(retour)
 
-        #=========================================================================================================
-        #=========================================================================================================
-  
-    btn_gestin = Button(F1 , text="🔔 GESTION DES ALERTES", fg=BG_MAIN , bg=COLOR_BTN 
+    btn_gestin = Button(F1 , text="🔔 GESTION DES ALERTES", fg=BG_MAIN , bg=COLOR_BTN
                            ,font=Font_texte , width= 30 , height=2 , command=lambda:alertes_medicament() )
     btn_gestin.place(x=260, y=95)
     btn_gestin.bind("<Enter>", on_enter)
     btn_gestin.bind("<Leave>", on_leave)
-    #=========================================================================================================
-    #=========================================================================================================
-    #                                            TABLEAU DES MEDICAMENT 
-    #=========================================================================================================
-    #=========================================================================================================
 
-    #================= TABLEAU DES MEDICAMENT ======================
     F2 = Frame(F1, bd=3, relief="flat" , bg=BG_MAIN)
     F2.place(x=1, y=150, width=950, height=390)
- 
-        #=============== CREATION DE TABLEAU =====================
+
     style = ttk.Style()
     style.theme_use("clam")
     style.configure("Treeview.Heading",
@@ -371,11 +310,10 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
     style.configure("Treeview",
                             font=("Bookman old style", 8),
                             background=BG_MAIN )
-    
-    tableau_general = ttk.Treeview(F2 , columns=(1,2,3,4,5,6,7,8,9) , height=14, 
+
+    tableau_general = ttk.Treeview(F2 , columns=(1,2,3,4,5,6,7,8,9) , height=14,
                            show="headings", style="Treeview")
-    
-          
+
     sc = ttk.Scrollbar(F2, orient="vertical" , command=tableau_general.yview)
     sc.place( x= 915 , y= 10 , height=307)
     tableau_general.config(yscrollcommand=sc.set)
@@ -389,7 +327,6 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
     tableau_general.heading(7, text="Prix d'Achat")
     tableau_general.heading(8, text="Prix de Vente")
     tableau_general.heading(9, text="Fournisseur")
-    
 
     tableau_general.column(1, width=25)
     tableau_general.column(2, width=115)
@@ -404,5 +341,3 @@ def medicament(content_frame, BG_MAIN, COLOR_TEXT, COLOR_ENTRY,ECRITURE, COLOR_B
     tableau_general.place(x=1, y=10)
 
     wb, ws = medicament_controlleur(tableau_general)
-
-

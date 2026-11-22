@@ -1,107 +1,150 @@
-from tkinter import *
+from openpyxl import load_workbook, Workbook
 from tkinter import messagebox
-import pandas as pd
 import os
-
+import hashlib
 from themes import colors
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FICHE_UTILISATEUR = os.path.join(BASE_DIR, "..", "UTILISATEUR.xlsx")
 
-COLONNES_UTILISATEUR = [
-    "Nom d'utilisateur",
-    "Nom Complet",
-    "Mot de passe",
-    "Confirmer le Mot de passe",
-    "Téléphone",
-    "Rôle"
-]
 
-# ============================================================
-# DATABASE - UTILISATEUR
-# ============================================================
-def bd_utilisateur():
-    """Crée le fichier Excel avec un admin par défaut s'il n'existe pas."""
+
+
+
+def initialise_fichier():
     if os.path.exists(FICHE_UTILISATEUR):
-        return
+        wb = load_workbook(FICHE_UTILISATEUR)
+        return wb, wb["Utilisateurs"]
 
-    pd.DataFrame([{
-        "Nom d'utilisateur"        : "mehdi",
-        "Nom Complet"              : "mehdi",
-        "Mot de passe"             : "1234",
-        "Confirmer le Mot de passe": "1234",
-        "Téléphone"                : "0612345678",
-        "Rôle"                     : "Admin"
-    }]).to_excel(FICHE_UTILISATEUR, index=False)
-
-
-def enregistrer_utilisateur(ustil, nom, password, conf, tele, role):
-    """Ajoute un nouvel utilisateur dans le fichier Excel."""
-    if os.path.exists(FICHE_UTILISATEUR):
-        df = pd.read_excel(FICHE_UTILISATEUR)
-    else:
-        df = pd.DataFrame(columns=COLONNES_UTILISATEUR)
-
-    nouveau = pd.DataFrame([{
-        "Nom d'utilisateur"        : ustil,
-        "Nom Complet"              : nom,
-        "Mot de passe"             : password,
-        "Confirmer le Mot de passe": conf,
-        "Téléphone"                : tele,
-        "Rôle"                     : role
-    }])
-
-    df = pd.concat([df, nouveau], ignore_index=True)
-    df.to_excel(FICHE_UTILISATEUR, index=False)
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Utilisateurs"
+    ws["A1"] = "ID"
+    ws["B1"] = "Nom de Utilisateur"
+    ws["C1"] = "Mot de passe"
+    ws["D1"] = "Rôle de l'Utilisateur"
+    ws.append([1, "admin", hashlib.sha256("admin123".encode()).hexdigest(), "Admin"])
+    wb.save(FICHE_UTILISATEUR)
+    return wb, ws
 
 
-def verifier_login(username, password):
-    """Vérifie les identifiants et retourne (True, role) ou (False, message)."""
-    if not os.path.exists(FICHE_UTILISATEUR):
-        return False, "Fichier introuvable"
+def creation_utilisateur(treeview):
+    wb, ws = initialise_fichier()
 
-    df = pd.read_excel(FICHE_UTILISATEUR)
-
-    user = df[
-        (df["Nom d'utilisateur"] == username) &
-        (df["Mot de passe"].astype(str) == password)
-    ]
-
-    if not user.empty:
-        return True, user.iloc[0]["Rôle"]
-
-    return False, "Nom d'utilisateur ou mot de passe incorrect"
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        if row[0] is None:
+            continue
+        treeview.insert("", "end", values=(row[0], row[1], "*******", row[3]))
+    return wb, ws
 
 
 def connexion(root, ent_user, ent_password):
-    from view import dashbord
+    nom = ent_user.get().strip()
+    mdp = ent_password.get()
 
-    username = ent_user.get().strip()
-    passw = ent_password.get().strip()
-
-    if not username or not passw:
-        messagebox.showwarning("Attention", "Veuillez remplir tous les champs")
+    if nom == "" or mdp == "":
+        messagebox.showwarning("Attention", "Remplis les champs")
         return
 
-    succes, resultat = verifier_login(username, passw)
+    mdp_hash = hashlib.sha256(mdp.encode()).hexdigest()
+    wb, ws = initialise_fichier()
 
-    if succes:
-        dashbord.open_dashboard(
-            root,
-            resultat,      # role
-            username,      # username
-            colors.BG_MAIN,
-            colors.COLOR_ENTRY,
-            colors.COLOR_TEXT,
-            colors.COLOR_BTN,
-            colors.ECRITURE,
-            colors.FONT_TITLE,
-            colors.on_enter,
-            colors.on_leave
-        )
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        if row[0] is None:
+            continue
+        if row[1] == nom and row[2] == mdp_hash:
+            from view import dashbord
+            dashbord.open_dashboard(root, row[3], row[1], colors.BG_MAIN, colors.COLOR_ENTRY, colors.COLOR_TEXT,
+                                    colors.COLOR_BTN, colors.ECRITURE, colors.FONT_TITLE, colors.on_enter, colors.on_leave)
+            return
+
+    messagebox.showerror("Erreur", "Nom d'utilisateur ou mot de passe incorrect")
+    ent_password.delete(0, "end")
+
+
+def enregistre_les_donnees(treeview, util_input, password, conf_password, les_choix, ws, wb):
+    nom = util_input.get().strip()
+    mdp = password.get()
+
+    if nom == "" or mdp == "":
+        messagebox.showinfo("Attention", "Remplis les champs")
+        return
+
+    if mdp != conf_password.get():
+        messagebox.showinfo("Attention", "Les mots de passe ne correspondent pas !")
+        return
+
+    selection = treeview.selection()
+    item_actuel = selection[0] if selection else None
+
+    for item in treeview.get_children():
+        if item != item_actuel and treeview.item(item, "values")[1] == nom:
+            messagebox.showinfo("Attention", "Ce nom d'utilisateur existe déjà")
+            return
+
+    mdp_hash = hashlib.sha256(mdp.encode()).hexdigest()
+
+    if item_actuel is None:
+        numero = len(treeview.get_children()) + 1
+        treeview.insert("", "end", values=(numero, nom, "*" * len(mdp), les_choix.get()))
+        ws.append([numero, nom, mdp_hash, les_choix.get()])
     else:
-        messagebox.showerror("Erreur", "Nom d'utilisateur ou mot de passe incorrect")
+        values = treeview.item(item_actuel, "values")
+        treeview.item(item_actuel, values=(values[0], nom, "*" * len(mdp), les_choix.get()))
+        row = treeview.index(item_actuel) + 2
+        ws["B" + str(row)] = nom
+        ws["C" + str(row)] = mdp_hash
+        ws["D" + str(row)] = les_choix.get()
+        treeview.selection_remove(item_actuel)
+
+    util_input.delete(0, "end")
+    password.delete(0, "end")
+    conf_password.delete(0, "end")
+
+    wb.save(FICHE_UTILISATEUR)
 
 
-# Crée le fichier utilisateur par défaut au chargement du module
-bd_utilisateur()
+def modifie_utilisateur(treeview, util_input, password, les_choix, wb):
+    selection = treeview.selection()
+
+    if not selection:
+        messagebox.showwarning("Attention", "Choisir un utilisateur")
+        return
+
+    values = treeview.item(selection[0], "values")
+
+    util_input.delete(0, "end")
+    util_input.insert(0, values[1])
+
+    password.delete(0, "end")
+
+    les_choix.set(values[3])
+
+    messagebox.showinfo("Modifier", "Change les informations, écris le nouveau mot de passe, puis clique sur AJOUTER")
+
+
+def supprime_utilisateur(treeview, ws, wb):
+    selection = treeview.selection()
+
+    if not selection:
+        messagebox.showwarning("Attention", "Choisir un utilisateur")
+        return
+
+    if not messagebox.askyesno("Confirmation", "Voulez-vous vraiment supprimer cet utilisateur ?"):
+        return
+
+    item = selection[0]
+    row = treeview.index(item) + 2
+
+    ws.delete_rows(row)
+    treeview.delete(item)
+
+    numero = 1
+    for ligne in treeview.get_children():
+        valeurs = list(treeview.item(ligne, "values"))
+        valeurs[0] = numero
+        treeview.item(ligne, values=valeurs)
+        ws.cell(row=numero + 1, column=1, value=numero)
+        numero += 1
+
+    wb.save(FICHE_UTILISATEUR)
